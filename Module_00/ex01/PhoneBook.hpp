@@ -14,15 +14,26 @@
 # define PHONE_BOOK_H
 
 # include "Contact.hpp"
+# include <cstdlib>
+# include <iomanip>
+# include <string>
 
 class PhoneBook
 {
 private:
-	Contact contacts[8];
+	int		contacts_count;
+	Contact	contacts[8];
+
+	std::string	get_input(std::string type);
+	std::string	get_print_string(std::string str);
 
 public:
 	PhoneBook();
 	~PhoneBook();
+
+	void	add_contact();
+	Contact	get_contact(int index);
+	void	search();
 };
 
 #endif

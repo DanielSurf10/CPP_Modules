@@ -1,7 +1,7 @@
 NAME		:= phonebook
 
 CC			:= c++
-FLAGS		:= -Wall -Wextra -Werror -std=c++98
+FLAGS		:= -Wall -Wextra -Werror -std=c++98 -g3
 
 HEADER		:= $(shell find . -name "*.hpp")
 SRC			:= $(shell find . -name "*.cpp")

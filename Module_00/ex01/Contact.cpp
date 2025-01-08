@@ -12,10 +12,51 @@
 
 #include "Contact.hpp"
 
-Contact::Contact()
+Contact::Contact() :
+	firstName(""),
+	lastName(""),
+	nickname(""),
+	phoneNumber(""),
+	darkestSecret("")
 {
 }
 
 Contact::~Contact()
 {
+}
+
+Contact::Contact(std::string firstName, std::string lastName,
+					std::string nickname, std::string phoneNumber,
+					std::string darkestSecret) :
+	firstName(firstName),
+	lastName(lastName),
+	nickname(nickname),
+	phoneNumber(phoneNumber),
+	darkestSecret(darkestSecret)
+{
+}
+
+std::string	Contact::get_firstName()
+{
+	return (this->firstName);
+}
+
+std::string	Contact::get_lastName()
+{
+	return (this->lastName);
+}
+
+std::string	Contact::get_nickname()
+{
+	return (this->nickname);
+}
+
+std::string	Contact::get_phoneNumber()
+{
+	return (this->phoneNumber);
+}
+
+std::string	Contact::get_darkestSecret()
+{
+	return (this->darkestSecret);
 }
