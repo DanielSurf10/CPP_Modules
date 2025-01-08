@@ -1,19 +1,11 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: danbarbo <danbarbo@student.42.fr>          +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2022/07/01 00:25:35 by ael-khni          #+#    #+#              #
-#    Updated: 2024/07/01 17:51:53 by danbarbo         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
 NAME		:= phonebook
 
 CC			:= c++
 FLAGS		:= -Wall -Wextra -Werror -std=c++98
+
+HEADER		:= $(shell find . -name "*.hpp")
+SRC			:= $(shell find . -name "*.cpp")
+OBJ			:= $(SRC:%.cpp=build/%.o)
 
 #Colors:
 GREEN		:= \e[92;5;118m
@@ -24,12 +16,20 @@ CURSIVE		:= \e[33;3m
 
 all: $(NAME)
 
-$(NAME): phonebook.cpp phonebook.hpp
+$(NAME): build $(OBJ)
 	@printf "$(CURSIVE)$(GRAY)- Compiling $(NAME)... $(RESET)\n"
-	@$(CC) $(FLAGS) megaphone.cpp -o $(NAME)
+	@$(CC) $(FLAGS) $(OBJ) -o $(NAME)
 	@printf "$(GREEN)- Executable ready.\n$(RESET)"
 
+build/%.o: %.cpp $(HEADER)
+	@printf "$(CURSIVE)$(GRAY)- Compiling $<... $(RESET)\n"
+	@$(CC) $(FLAGS) -c $< -o $@
+
+build:
+	@mkdir -p build
+
 clean:
+	@rm -rf build
 	@rm -rf $(NAME)
 	@printf "$(YELLOW)- Executable removed.$(RESET)\n"
 
