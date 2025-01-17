@@ -1,9 +1,9 @@
 #include "Replace.hpp"
 
-Replace::Replace(std::string file_name, std::string to_find, std::string replace)
-	: _file_name(file_name), _to_find(to_find), _replace(replace)
+Replace::Replace(std::string file_name, std::string to_find, std::string replace) :
+	_file_name(file_name), _file_stream(file_name.c_str()),
+	_to_find(to_find), _replace(replace)
 {
-	this->_file_stream = std::ifstream(file_name.c_str());
 }
 
 Replace::~Replace()
@@ -14,19 +14,18 @@ Replace::~Replace()
 
 void	Replace::create_replaced_file()
 {
-	unsigned int	pos;
-	std::string		new_file_content;
-	std::string		new_file_name = this->_file_name + ".replace";
-	std::ofstream	new_file_stream;
+	size_t		pos;
+	std::string	new_file_content;
 
+	std::string	out_file_name = this->_file_name + ".replace";
 	if (_file_stream.is_open() == 0)
 	{
 		std::cerr << "Error: could not open the input file" << std::endl;
 		return ;
 	}
 
-	new_file_stream = std::ofstream(new_file_name.c_str());
-	if (new_file_stream.is_open() == 0)
+	std::ofstream	out_file_stream(out_file_name.c_str());
+	if (out_file_stream.is_open() == 0)
 	{
 		std::cerr << "Error: could not create the output file" << std::endl;
 		return ;
@@ -42,6 +41,6 @@ void	Replace::create_replaced_file()
 		pos = new_file_content.find(this->_to_find);
 	}
 
-	new_file_stream << new_file_content;
-	new_file_stream.close();
+	out_file_stream << new_file_content;
+	out_file_stream.close();
 }
