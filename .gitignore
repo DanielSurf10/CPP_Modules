@@ -1,4 +1,9 @@
 **/build/**
+
+# Module_0*/ex*/**
+# !Module_0*/ex*/*.cpp
+# !Module_0*/ex*/**.hpp
+
 Module_00/ex00/megaphone
 Module_00/ex01/phonebook
 Module_00/ex02/account
@@ -10,3 +15,4 @@ Module_01/ex04/replace
 Module_01/ex04/*.replace
 Module_01/ex05/harl
 Module_01/ex06/harlFilter
+Module_02/ex00/fixed
