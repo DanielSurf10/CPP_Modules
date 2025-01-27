@@ -76,7 +76,7 @@ void	Account::displayAccountsInfos()
 	std::cout << ";total:" << Account::getTotalAmount();
 	std::cout << ";deposits:" << Account::getNbDeposits();
 	std::cout << ";withdrawals:" << Account::getNbWithdrawals();
-	std::cout << " " << std::endl;
+	std::cout << std::endl;
 }
 
 void	Account::displayStatus() const
