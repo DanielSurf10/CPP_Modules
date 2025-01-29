@@ -1,13 +1,5 @@
 #include "ScavTrap.hpp"
 
-ScavTrap::ScavTrap() : ClapTrap()
-{
-	std::cout << "ScavTrap " << this->name << " is alive" << std::endl;
-	this->hit_points = 100;
-	this->energy_points = 50;
-	this->attack_damage = 20;
-}
-
 ScavTrap::ScavTrap(const std::string name) : ClapTrap(name)
 {
 	std::cout << "ScavTrap " << this->name << " is alive" << std::endl;
