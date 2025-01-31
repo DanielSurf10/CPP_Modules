@@ -3,8 +3,8 @@ NAME		:= scavtrap
 CC			:= c++
 FLAGS		:= -Wall -Wextra -Werror -std=c++98 -g3
 
-HEADER		:= $(shell find . -name "*.hpp")
-SRC			:= $(shell find . -name "*.cpp")
+HEADER		:= ClapTrap.hpp ScavTrap.hpp
+SRC			:= ClapTrap.cpp main.cpp ScavTrap.cpp
 OBJ			:= $(SRC:%.cpp=build/%.o)
 
 #Colors:

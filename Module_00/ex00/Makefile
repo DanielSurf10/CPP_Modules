@@ -3,8 +3,8 @@ NAME		:= megaphone
 CC			:= c++
 FLAGS		:= -Wall -Wextra -Werror -std=c++98
 
-HEADER		:= $(shell find . -name "*.hpp")
-SRC			:= $(shell find . -name "*.cpp")
+HEADER		:= 
+SRC			:= megaphone.cpp
 OBJ			:= $(SRC:%.cpp=build/%.o)
 
 #Colors:

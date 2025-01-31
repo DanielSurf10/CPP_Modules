@@ -3,8 +3,8 @@ NAME		:= attack
 CC			:= c++
 FLAGS		:= -Wall -Wextra -Werror -std=c++98 -g3
 
-HEADER		:= $(shell find . -name "*.hpp")
-SRC			:= $(shell find . -name "*.cpp")
+HEADER		:= HumanA.hpp HumanB.hpp Weapon.hpp
+SRC			:= HumanA.cpp HumanB.cpp main.cpp Weapon.cpp
 OBJ			:= $(SRC:%.cpp=build/%.o)
 
 #Colors:

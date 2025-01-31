@@ -3,8 +3,8 @@ NAME		:= zombie
 CC			:= c++
 FLAGS		:= -Wall -Wextra -Werror -std=c++98 -g3
 
-HEADER		:= $(shell find . -name "*.hpp")
-SRC			:= $(shell find . -name "*.cpp")
+HEADER		:=
+SRC			:= main.cpp
 OBJ			:= $(SRC:%.cpp=build/%.o)
 
 #Colors:
