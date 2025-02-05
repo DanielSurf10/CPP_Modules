@@ -4,7 +4,7 @@ CC			:= c++
 FLAGS		:= -Wall -Wextra -Werror -std=c++98 -g3
 
 HEADER		:= ClapTrap.hpp DiamondTrap.hpp FragTrap.hpp ScavTrap.hpp
-SRC			:= ClapTrap.cpp DiamoundTrap.cpp FragTrap.cpp main.cpp ScavTrap.cpp
+SRC			:= ClapTrap.cpp DiamondTrap.cpp FragTrap.cpp main.cpp ScavTrap.cpp
 OBJ			:= $(SRC:%.cpp=build/%.o)
 
 #Colors:

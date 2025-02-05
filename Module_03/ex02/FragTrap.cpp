@@ -44,7 +44,6 @@ void	FragTrap::highFivesGuys(void)
 	std::cout << "FragTrap " << this->name << " requests a high five" << std::endl;
 }
 
-
 void	FragTrap::attack(const std::string& target)
 {
 	if (this->hit_points == 0)
