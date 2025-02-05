@@ -1,10 +1,10 @@
-NAME		:= diamondtrap
+NAME		:=
 
 CC			:= c++
 FLAGS		:= -Wall -Wextra -Werror -std=c++98 -g3
 
-HEADER		:= ClapTrap.hpp DiamondTrap.hpp FragTrap.hpp ScavTrap.hpp
-SRC			:= ClapTrap.cpp DiamondTrap.cpp FragTrap.cpp main.cpp ScavTrap.cpp
+HEADER		:= $(shell find . -name "*.hpp")
+SRC			:= $(shell find . -name "*.cpp")
 OBJ			:= $(SRC:%.cpp=build/%.o)
 
 #Colors:

@@ -1,10 +1,14 @@
-NAME		:= diamondtrap
+NAME		:= materia
 
 CC			:= c++
 FLAGS		:= -Wall -Wextra -Werror -std=c++98 -g3
 
-HEADER		:= ClapTrap.hpp DiamondTrap.hpp FragTrap.hpp ScavTrap.hpp
-SRC			:= ClapTrap.cpp DiamondTrap.cpp FragTrap.cpp main.cpp ScavTrap.cpp
+ifdef DEBUG
+FLAGS		+= -DDEBUG
+endif
+
+HEADER		:= AMateria.hpp Character.hpp Cure.hpp Ice.hpp ICharacter.hpp IMateriaSource.hpp MateriaSource.hpp
+SRC			:= AMateria.cpp Character.cpp Cure.cpp Ice.cpp main.cpp MateriaSource.cpp
 OBJ			:= $(SRC:%.cpp=build/%.o)
 
 #Colors:
