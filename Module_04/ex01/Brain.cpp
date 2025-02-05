@@ -6,9 +6,9 @@ Brain::Brain()
 	for (int i = 0; i < 100; ++i)
 	{
 		if (i % 2 == 0)
-			ideas[i] = "chase tail";
+			this->ideas[i] = "chase tail";
 		else
-			ideas[i] = "nap in the sun";
+			this->ideas[i] = "nap in the sun";
 	}
 }
 
@@ -16,7 +16,7 @@ Brain::Brain(const Brain &copy)
 {
 	std::cout << "Copy constructor Brain" << std::endl;
 	for (int i = 0; i < 100; ++i)
-		ideas[i] = copy.ideas[i];
+		this->ideas[i] = copy.ideas[i];
 }
 
 Brain	&Brain::operator=(const Brain &copy)
@@ -25,7 +25,7 @@ Brain	&Brain::operator=(const Brain &copy)
 	if (this == &copy)
 		return (*this);
 	for (int i = 0; i < 100; ++i)
-		ideas[i] = copy.ideas[i];
+		this->ideas[i] = copy.ideas[i];
 	return (*this);
 }
 
@@ -36,10 +36,10 @@ Brain::~Brain()
 
 std::string	Brain::getIdea(int index) const
 {
-	return (ideas[index]);
+	return (this->ideas[index]);
 }
 
 void	Brain::setIdea(int index, std::string idea)
 {
-	ideas[index] = idea;
+	this->ideas[index] = idea;
 }
