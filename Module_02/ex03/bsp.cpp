@@ -27,7 +27,7 @@ bool bsp(Point const a, Point const b, Point const c, Point const point)
 	Fixed apc = triangleArea(a, point, c);
 	Fixed abp = triangleArea(a, b, point);
 
-	if (abp == 0 || pbc == 0 || apc == 0)
-		return (false);
+	// if (abp == 0 || pbc == 0 || apc == 0)
+	// 	return (false);
 	return ((abc == (pbc + apc + abp)));
 }
