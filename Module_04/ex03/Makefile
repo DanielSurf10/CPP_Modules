@@ -7,8 +7,8 @@ ifdef DEBUG
 FLAGS		+= -DDEBUG
 endif
 
-HEADER		:= $(shell find . -name "*.hpp")
-SRC			:= $(shell find . -name "*.cpp")
+HEADER		:= AMateria.hpp Character.hpp Cure.hpp Ice.hpp ICharacter.hpp IMateriaSource.hpp MateriaSource.hpp
+SRC			:= AMateria.cpp Character.cpp Cure.cpp Ice.cpp main.cpp MateriaSource.cpp
 OBJ			:= $(SRC:%.cpp=build/%.o)
 
 #Colors:

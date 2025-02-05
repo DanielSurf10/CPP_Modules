@@ -3,8 +3,8 @@ NAME		:= abstract
 CC			:= c++
 FLAGS		:= -Wall -Wextra -Werror -std=c++98 -g3
 
-HEADER		:= $(shell find . -name "*.hpp")
-SRC			:= $(shell find . -name "*.cpp")
+HEADER		:= AAnimal.hpp Brain.hpp Cat.hpp Dog.hpp
+SRC			:= AAnimal.cpp Brain.cpp Cat.cpp Dog.cpp main.cpp
 OBJ			:= $(SRC:%.cpp=build/%.o)
 
 #Colors:
