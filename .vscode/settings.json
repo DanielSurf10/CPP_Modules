@@ -72,6 +72,7 @@
 		"__split_buffer": "cpp",
 		"queue": "cpp",
 		"set": "cpp",
-		"execution": "cpp"
+		"execution": "cpp",
+		"*.tpp": "cpp"
 	}
 }
