@@ -22,6 +22,13 @@ void ScalarConverter::convert(const std::string &str) {
 
 	f = atof(str.c_str());
 	d = static_cast<double>(f);
+
+	if (str.size() == 1 && !std::isdigit(str[0]) && std::isprint(str[0]))
+	{
+		f = static_cast<float>(str[0]);
+		d = static_cast<double>(f);
+	}
+
 	i = static_cast<int>(f);
 
 	if (i < -128 || i > 127)
