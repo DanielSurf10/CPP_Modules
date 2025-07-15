@@ -3,6 +3,7 @@
 
 #include <iterator>
 #include <iostream>
+#include <cmath>
 
 template <typename Container>
 class PmergeMe {
@@ -16,7 +17,7 @@ class PmergeMe {
 	public:
 		static void sort(typename Container::iterator first, typename Container::iterator last, int order);
 		static bool compare(typename Container::iterator a, typename Container::iterator b);
-		static typename Container::iterator findInsertionPoint(Container& main_chain, typename Container::value_type reference_value, int order);
+		static typename Container::iterator findInsertionPoint(Container& main_chain, typename Container::value_type reference_value, size_t limit, int order);
 };
 
 template <typename Container>
@@ -41,21 +42,21 @@ void PmergeMe<Container>::sort(typename Container::iterator first, typename Cont
 	// predecessor that fit in 64 bits, starting with the difference
 	// between the Jacobsthal numbers 4 and 3 (the previous ones are
 	// unneeded)
-	// static const unsigned long long jacobsthal_diff[] = {
-	// 	2ULL, 2ULL, 6ULL, 10ULL, 22ULL, 42ULL, 86ULL, 170ULL, 342ULL, 682ULL, 1366ULL,
-	// 	2730ULL, 5462ULL, 10922ULL, 21846ULL, 43690ULL, 87382ULL, 174762ULL, 349526ULL, 699050ULL,
-	// 	1398102ULL, 2796202ULL, 5592406ULL, 11184810ULL, 22369622ULL, 44739242ULL, 89478486ULL,
-	// 	178956970ULL, 357913942ULL, 715827882ULL, 1431655766ULL, 2863311530ULL, 5726623062ULL,
-	// 	11453246122ULL, 22906492246ULL, 45812984490ULL, 91625968982ULL, 183251937962ULL,
-	// 	366503875926ULL, 733007751850ULL, 1466015503702ULL, 2932031007402ULL, 5864062014806ULL,
-	// 	11728124029610ULL, 23456248059222ULL, 46912496118442ULL, 93824992236886ULL, 187649984473770ULL,
-	// 	375299968947542ULL, 750599937895082ULL, 1501199875790165ULL, 3002399751580331ULL,
-	// 	6004799503160661ULL, 12009599006321322ULL, 24019198012642644ULL, 48038396025285288ULL,
-	// 	96076792050570576ULL, 192153584101141152ULL, 384307168202282304ULL, 768614336404564608ULL,
-	// 	1537228672809129216ULL, 3074457345618258432ULL, 6148914691236516864ULL
-	// };
+	static const unsigned long long jacobsthal_diff[] = {
+		2ULL, 2ULL, 6ULL, 10ULL, 22ULL, 42ULL, 86ULL, 170ULL, 342ULL, 682ULL, 1366ULL,
+		2730ULL, 5462ULL, 10922ULL, 21846ULL, 43690ULL, 87382ULL, 174762ULL, 349526ULL, 699050ULL,
+		1398102ULL, 2796202ULL, 5592406ULL, 11184810ULL, 22369622ULL, 44739242ULL, 89478486ULL,
+		178956970ULL, 357913942ULL, 715827882ULL, 1431655766ULL, 2863311530ULL, 5726623062ULL,
+		11453246122ULL, 22906492246ULL, 45812984490ULL, 91625968982ULL, 183251937962ULL,
+		366503875926ULL, 733007751850ULL, 1466015503702ULL, 2932031007402ULL, 5864062014806ULL,
+		11728124029610ULL, 23456248059222ULL, 46912496118442ULL, 93824992236886ULL, 187649984473770ULL,
+		375299968947542ULL, 750599937895082ULL, 1501199875790165ULL, 3002399751580331ULL,
+		6004799503160661ULL, 12009599006321322ULL, 24019198012642644ULL, 48038396025285288ULL,
+		96076792050570576ULL, 192153584101141152ULL, 384307168202282304ULL, 768614336404564608ULL,
+		1537228672809129216ULL, 3074457345618258432ULL, 6148914691236516864ULL
+	};
 
-	int size = std::distance(first, last) / order;									// Calcula o tamanho do grupo de elementos
+	int size = std::floor(std::distance(first, last) / (order));					// Calcula o tamanho do grupo de elementos
 	if (size < 2)																	// Se o tamanho for menor que 2, não há nada a ordenar
 		return;
 
@@ -100,49 +101,36 @@ void PmergeMe<Container>::sort(typename Container::iterator first, typename Cont
 	}
 
 	// Coloca os elementos que não formaram pares na pend chain
-	if (has_stray && std::distance(end, last) == order)
-		pend_chain.insert(pend_chain.end(), end, last);
+	if (has_stray && std::distance(end, last) >= order)
+		pend_chain.insert(pend_chain.end(), end, end + order);
 
 	// Inserção binária na main chain
 
-// 	int	k = 0;
-// 	while (true) {
-// 		std::size_t dist = jacobsthal_diff[k];
-//
-// 		if (dist >= pend_chain.size() / order)
-// 			break;
-//
-// 		typename Container::iterator it = pend_chain.begin() + (dist * order);
-//
-// 		while (true) {
-// 			typename Container::iterator insertion_point = PmergeMe::findInsertionPoint(main_chain, *it, order);
-//
-// 			// std::cout << "Main chain: ";
-// 			// for (typename Container::iterator it = main_chain.begin(); it != main_chain.end(); ++it) {
-// 			// 	std::cout << *it << " ";
-// 			// }
-// 			// std::cout << "\nPend chain: ";
-// 			// for (typename Container::iterator it = pend_chain.begin(); it != pend_chain.end(); ++it) {
-// 			// 	std::cout << *it << " ";
-// 			// }
-// 			// std::cout << std::endl;
-//
-// 			main_chain.insert(insertion_point, it + 1 - order, it + 1);
-// 			pend_chain.erase(it + 1 - order, it + 1);
-//
-//
-// 			if (it == pend_chain.begin())
-// 				break;
-//
-// 			it -= order;
-// 		}
-//
-// 		k++;
-// 	}
+	int	k = 0;
+	while (true) {
+		std::size_t dist = jacobsthal_diff[k];
+
+		if (dist >= pend_chain.size() / order)
+			break;
+
+		typename Container::iterator it = (pend_chain.begin() + (dist * order)) - 1;
+
+		while (dist > 0) {
+			typename Container::iterator insertion_point = PmergeMe::findInsertionPoint(main_chain, *it, (main_chain.size() / order) - 1, order);
+
+			main_chain.insert(insertion_point, it - order + 1, it + 1);
+			pend_chain.erase(it - order + 1, it + 1);
+
+			it -= order;
+			dist--;
+		}
+
+		k++;
+	}
 
 	while (!pend_chain.empty()) {
 		typename Container::iterator it = pend_chain.end() - 1;
-		typename Container::iterator insertion_point = PmergeMe::findInsertionPoint(main_chain, *it, order);
+		typename Container::iterator insertion_point = PmergeMe::findInsertionPoint(main_chain, *it, (main_chain.size() / order) - 1, order);
 		main_chain.insert(insertion_point, it + 1 - order, it + 1);
 		pend_chain.erase(it + 1 - order, it + 1);
 	}
@@ -160,10 +148,10 @@ bool PmergeMe<Container>::compare(typename Container::iterator a, typename Conta
 }
 
 template <typename Container>
-typename Container::iterator PmergeMe<Container>::findInsertionPoint(Container& main_chain, typename Container::value_type reference_value, int order) {
+typename Container::iterator PmergeMe<Container>::findInsertionPoint(Container& main_chain, typename Container::value_type reference_value, size_t limit, int order) {
 
 	int	left = 0;
-	int	right = (main_chain.size() / order) - 1;
+	int	right = limit;
 
 	while (left <= right) {
 		int	mid = left + (right - left) / 2;
@@ -179,27 +167,5 @@ typename Container::iterator PmergeMe<Container>::findInsertionPoint(Container& 
 
 	return main_chain.begin() + (left * order);
 }
-
-// int binarySearchGroups(const std::vector<int>& arr, int target, int group_size) {
-//	 int left = 0;
-//	 int right = (arr.size() / group_size) - 1;
-//
-//	 while (left <= right) {
-//		 int mid = left + (right - left) / 2;
-//		 int group_max = arr[(mid + 1) * group_size - 1];  // Último elemento do grupo
-//
-//		 if (group_max == target) {
-//			 return mid * group_size;  // Retorna início do grupo
-//		 }
-//		 else if (group_max < target) {
-//			 left = mid + 1;
-//		 }
-//		 else {
-//			 right = mid - 1;
-//		 }
-//	 }
-//
-//	 return left * group_size;  // Posição para inserção
-// }
 
 #endif
