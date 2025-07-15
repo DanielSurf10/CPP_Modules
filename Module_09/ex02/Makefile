@@ -1,7 +1,7 @@
 NAME		:= PmergeMe
 
 CC			:= c++
-FLAGS		:= -Wall -Wextra -Werror -std=c++98 -g3
+FLAGS		:=  -std=c++98 -g3
 
 ifdef DEBUG
 FLAGS		+= -DDEBUG
