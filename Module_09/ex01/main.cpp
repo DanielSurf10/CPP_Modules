@@ -6,6 +6,14 @@ int main(int argc, char **argv) {
 		return (1);
 	}
 
-	RPN	rpn(std::string(argv[1]));
-	rpn.perform();
+	try {
+		RPN	rpn(argv[1]);
+
+		int result = rpn.perform();
+		std::cout << "Result: " << result << std::endl;
+	}
+	catch(const std::exception& e) {
+		std::cerr << e.what() << '\n';
+	}
+
 }
