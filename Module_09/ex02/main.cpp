@@ -40,13 +40,13 @@ int main() {
 // 	int arr[] = {8008,5882,8250,1640,2994,9559,5750,9559,8419,4497,6889,6680,3980,8675,7624};
 // 	vec.insert(vec.end(), std::begin(arr), std::end(arr));
 //
-// 	std::vector<int>::iterator begin = vec.begin();
-// 	std::vector<int>::iterator end = vec.end();
-// 	PmergeMe<std::vector<int> >::sort(begin, end, 1, vec);
+// 	std::deque<int>::iterator begin = vec.begin();
+// 	std::deque<int>::iterator end = vec.end();
+// 	PmergeMe<std::deque<int> >::sort(begin, end, 1, vec);
 //
 //
 // 	bool isSorted = true;
-// 	for (std::vector<int>::iterator it = vec.begin(); it != vec.end() - 1; ++it) {
+// 	for (std::deque<int>::iterator it = vec.begin(); it != vec.end() - 1; ++it) {
 // 		if (*it > *(it + 1)) {
 // 			isSorted = false;
 // 			break;
@@ -63,7 +63,7 @@ int main() {
 // 	}
 
 	for (int i = 1; i < 11000; i++) {
-		for (int a = 0; a < 100; a++) {
+		for (int a = 0; a < 1; a++) {
 			static int seed = 0;
 			srand(time(NULL) + seed++);
 			for (int j = 0; j < i; j++) {
