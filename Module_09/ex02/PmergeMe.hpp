@@ -17,7 +17,7 @@ class PmergeMe {
 		~PmergeMe();
 
 	public:
-		static void sort(typename Container::iterator first, typename Container::iterator last, int order);
+		static void sort(typename Container::iterator first, typename Container::iterator last, int order, Container& vec);
 		static bool compare(typename Container::iterator a, typename Container::iterator b);
 		static typename Container::iterator	find_position(typename Container::iterator reference_value, typename Container::iterator first, typename Container::iterator last, int order);
 		static typename Container::iterator get_element_at(typename Container::iterator begin, int index);
@@ -46,32 +46,32 @@ typename Container::iterator PmergeMe<Container>::get_element_at(typename Contai
 }
 
 template <typename Container>
-void PmergeMe<Container>::sort(typename Container::iterator first, typename Container::iterator last, int order) {
+void PmergeMe<Container>::sort(typename Container::iterator first, typename Container::iterator last, int order, Container& vec) {
 
 	// Cache all the differences between a Jacobsthal number and its
 	// predecessor that fit in 64 bits, starting with the difference
 	// between the Jacobsthal numbers 4 and 3 (the previous ones are
 	// unneeded)
-	static const unsigned long long jacobsthal_diff[] = {
-		2ULL, 2ULL, 6ULL, 10ULL, 22ULL, 42ULL, 86ULL, 170ULL, 342ULL, 682ULL, 1366ULL,
-		2730ULL, 5462ULL, 10922ULL, 21846ULL, 43690ULL, 87382ULL, 174762ULL, 349526ULL, 699050ULL,
-		1398102ULL, 2796202ULL, 5592406ULL, 11184810ULL, 22369622ULL, 44739242ULL, 89478486ULL,
-		178956970ULL, 357913942ULL, 715827882ULL, 1431655766ULL, 2863311530ULL, 5726623062ULL,
-		11453246122ULL, 22906492246ULL, 45812984490ULL, 91625968982ULL, 183251937962ULL,
-		366503875926ULL, 733007751850ULL, 1466015503702ULL, 2932031007402ULL, 5864062014806ULL,
-		11728124029610ULL, 23456248059222ULL, 46912496118442ULL, 93824992236886ULL, 187649984473770ULL,
-		375299968947542ULL, 750599937895082ULL, 1501199875790165ULL, 3002399751580331ULL,
-		6004799503160661ULL, 12009599006321322ULL, 24019198012642644ULL, 48038396025285288ULL,
-		96076792050570576ULL, 192153584101141152ULL, 384307168202282304ULL, 768614336404564608ULL,
-		1537228672809129216ULL, 3074457345618258432ULL, 6148914691236516864ULL
-	};
-
-	static const unsigned long long jacobsthal[] = {
-		0ULL, 1ULL, 1ULL, 3ULL, 5ULL, 11ULL, 21ULL, 43ULL, 85ULL, 171ULL, 341ULL,
-		683ULL, 1365ULL, 2731ULL, 5461ULL, 10923ULL, 21845ULL, 43691ULL, 87381ULL,
-		174763ULL, 349525ULL, 699051ULL, 1398101ULL, 2796203ULL, 5592405ULL, 11184811ULL,
-		22369621ULL, 44739243ULL, 89478485ULL
-	};
+// 	static const unsigned long long jacobsthal_diff[] = {
+// 		2ULL, 2ULL, 6ULL, 10ULL, 22ULL, 42ULL, 86ULL, 170ULL, 342ULL, 682ULL, 1366ULL,
+// 		2730ULL, 5462ULL, 10922ULL, 21846ULL, 43690ULL, 87382ULL, 174762ULL, 349526ULL, 699050ULL,
+// 		1398102ULL, 2796202ULL, 5592406ULL, 11184810ULL, 22369622ULL, 44739242ULL, 89478486ULL,
+// 		178956970ULL, 357913942ULL, 715827882ULL, 1431655766ULL, 2863311530ULL, 5726623062ULL,
+// 		11453246122ULL, 22906492246ULL, 45812984490ULL, 91625968982ULL, 183251937962ULL,
+// 		366503875926ULL, 733007751850ULL, 1466015503702ULL, 2932031007402ULL, 5864062014806ULL,
+// 		11728124029610ULL, 23456248059222ULL, 46912496118442ULL, 93824992236886ULL, 187649984473770ULL,
+// 		375299968947542ULL, 750599937895082ULL, 1501199875790165ULL, 3002399751580331ULL,
+// 		6004799503160661ULL, 12009599006321322ULL, 24019198012642644ULL, 48038396025285288ULL,
+// 		96076792050570576ULL, 192153584101141152ULL, 384307168202282304ULL, 768614336404564608ULL,
+// 		1537228672809129216ULL, 3074457345618258432ULL, 6148914691236516864ULL
+// 	};
+//
+// 	static const unsigned long long jacobsthal[] = {
+// 		0ULL, 1ULL, 1ULL, 3ULL, 5ULL, 11ULL, 21ULL, 43ULL, 85ULL, 171ULL, 341ULL,
+// 		683ULL, 1365ULL, 2731ULL, 5461ULL, 10923ULL, 21845ULL, 43691ULL, 87381ULL,
+// 		174763ULL, 349525ULL, 699051ULL, 1398101ULL, 2796203ULL, 5592405ULL, 11184811ULL,
+// 		22369621ULL, 44739243ULL, 89478485ULL
+// 	};
 
 	int size = std::floor(std::distance(first, last) / (order));
 	if (size < 2)
@@ -80,7 +80,6 @@ void PmergeMe<Container>::sort(typename Container::iterator first, typename Cont
 	// Quando há um elemento que não consegue formar um grupo de tamanho 'order'
 	// no final
 	bool has_stray = (size % 2 != 0);
-	// bool has_odd = std::distance(first + order * size, last) != 0;
 
 	// Agrupar os elementos em grupos de tamanho 'order'
 
@@ -89,20 +88,15 @@ void PmergeMe<Container>::sort(typename Container::iterator first, typename Cont
 	typename Container::iterator end = PmergeMe<Container>::get_element_at(first, order * size - (has_stray ? order : 0));
 
 	for (typename Container::iterator it = first; it != end; std::advance(it, order * 2)) {
-		// if (PmergeMe::compare(it + (order - 1), it + ((order * 2) - 1))) {
-		// 	std::swap_ranges(it, it + order, it + order);
-		// }
-
 		if (PmergeMe<Container>::compare(PmergeMe<Container>::get_element_at(it, order - 1), PmergeMe<Container>::get_element_at(it, (order * 2) - 1))) {
 			std::swap_ranges(it, PmergeMe<Container>::get_element_at(it, order), PmergeMe<Container>::get_element_at(it, order));
 		}
-
 	}
 
 	// Ordenar recursivamente os grupos de pares até que não seja mais possível
 	// dividir em grupos
 
-	PmergeMe<Container>::sort(first, end, order * 2);
+	PmergeMe<Container>::sort(first, end, order * 2, vec);
 
 	Container main_chain;
 	std::vector<std::pair<Container, size_t> > pend_chain;
@@ -122,42 +116,13 @@ void PmergeMe<Container>::sort(typename Container::iterator first, typename Cont
 		pend_chain.push_back(pend_pair);
 	}
 
-// 	for (int k = 0; ; k++) {
-// 		unsigned long long dist = jacobsthal_diff[k];
-//
-// 		if (dist >= pend_chain.size())
-// 			break;
-//
-// 		std::vector<std::pair<Container, size_t> >::interator
-// 	}
-
 	while (!pend_chain.empty()) {
-		typename std::vector<std::pair<Container, size_t> >::iterator	last_item_in_pend = std::prev(pend_chain.end());
-		typename Container::iterator	insertion_point = PmergeMe::find_position(last_item_in_pend->first.begin(), main_chain.begin(), PmergeMe::get_element_at(main_chain.begin(), last_item_in_pend->second * order), order);
+		typename std::vector<std::pair<Container, size_t> >::iterator	last_item_in_pend = --(pend_chain.end());
+		// typename Container::iterator	insertion_point = PmergeMe::find_position(last_item_in_pend->first.begin(), main_chain.begin(), PmergeMe::get_element_at(main_chain.begin(), last_item_in_pend->second * order), order);
 
-		for (typename Container::iterator print = main_chain.begin(); print != main_chain.end(); std::advance(print, order)) {
-			std::cout << "( ";
-			// for (int i = 0; i < order; i++) {
-			// 	std::cout << *(print + i) << " ";
-			// }
-			std::cout << *(print + order) << " ";
-			std::cout << ") ";
-		}
-
-		// typename Container::iterator	insertion_point = PmergeMe::find_position(last_item_in_pend->first.begin(), main_chain.begin(), PmergeMe::get_element_at(main_chain.end(), -1), order);
+		typename Container::iterator	insertion_point = PmergeMe::find_position(last_item_in_pend->first.begin(), main_chain.begin(), PmergeMe::get_element_at(main_chain.end(), -order), order);
 
 		main_chain.insert(insertion_point, last_item_in_pend->first.begin(), last_item_in_pend->first.end());
-
-		std::cout << "Apos inserido ";
-		for (typename Container::iterator print = main_chain.begin(); print != main_chain.end(); std::advance(print, order)) {
-			std::cout << "( ";
-			// for (int i = 0; i < order; i++) {
-			// 	std::cout << *(print + i) << " ";
-			// }
-			std::cout << *(print + order) << " ";
-			std::cout << ") ";
-		}
-		std::cout << std::endl;
 
 		pend_chain.pop_back();
 	}
@@ -213,29 +178,12 @@ typename Container::iterator	PmergeMe<Container>::find_position(typename Contain
 		mid_value = *(PmergeMe::get_element_at(first, idx_mid * order + order - 1));
 
 		if (mid_value == *reference_value)
-			return (PmergeMe::get_element_at(first, idx_mid * order + order - 1));
+			return (PmergeMe::get_element_at(first, idx_mid * order + order));
 		else if (mid_value > *reference_value)
 			idx_last = idx_mid - 1;
 		else
 			idx_first = idx_mid + 1;
 	}
-
-	// std::copy(first, last, std::ostream_iterator<int>(std::cout, " "));
-
-	// for (typename Container::iterator print = first; std::distance(print, last) >= order; std::advance(print, order)) {
-	// 	std::cout << "( ";
-	// 	for (int i = 0; i < order; i++) {
-	// 		std::cout << *get_element_at(print, i) << " ";
-	// 	}
-	// 	std::cout << ") ";
-	// }
-
-	std::cout << "\n";
-	std::cout << "Procurado: " << std::setw(6) << *reference_value << " ";
-	std::cout << "First:     " << std::setw(6) << *first << " ";
-	std::cout << "Last:      " << std::setw(6) << *last << " ";
-	std::cout << "Econtrado: " << std::setw(6) << *PmergeMe::get_element_at(first, idx_first * order) << " ";
-	std::cout << std::endl;
 
 	return (PmergeMe::get_element_at(first, idx_first * order));
 }
