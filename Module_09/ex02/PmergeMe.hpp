@@ -4,6 +4,8 @@
 #include <iterator>
 #include <iostream>
 #include <cmath>
+#include <vector>
+#include <iomanip>
 
 template <typename Container>
 class PmergeMe {
@@ -17,7 +19,8 @@ class PmergeMe {
 	public:
 		static void sort(typename Container::iterator first, typename Container::iterator last, int order);
 		static bool compare(typename Container::iterator a, typename Container::iterator b);
-		static typename Container::iterator findInsertionPoint(Container& main_chain, typename Container::value_type reference_value, size_t limit, int order);
+		static typename Container::iterator	find_position(typename Container::iterator reference_value, typename Container::iterator first, typename Container::iterator last, int order);
+		static typename Container::iterator get_element_at(typename Container::iterator begin, int index);
 };
 
 template <typename Container>
@@ -34,6 +37,13 @@ PmergeMe<Container>& PmergeMe<Container>::operator=(const PmergeMe& other) {
 
 template <typename Container>
 PmergeMe<Container>::~PmergeMe() {}
+
+template<typename Container>
+typename Container::iterator PmergeMe<Container>::get_element_at(typename Container::iterator begin, int index) {
+	typename Container::iterator it = begin;
+	std::advance(it, index);
+	return it;
+}
 
 template <typename Container>
 void PmergeMe<Container>::sort(typename Container::iterator first, typename Container::iterator last, int order) {
@@ -56,31 +66,37 @@ void PmergeMe<Container>::sort(typename Container::iterator first, typename Cont
 		1537228672809129216ULL, 3074457345618258432ULL, 6148914691236516864ULL
 	};
 
-	int size = std::floor(std::distance(first, last) / (order));					// Calcula o tamanho do grupo de elementos
-	if (size < 2)																	// Se o tamanho for menor que 2, não há nada a ordenar
+	static const unsigned long long jacobsthal[] = {
+		0ULL, 1ULL, 1ULL, 3ULL, 5ULL, 11ULL, 21ULL, 43ULL, 85ULL, 171ULL, 341ULL,
+		683ULL, 1365ULL, 2731ULL, 5461ULL, 10923ULL, 21845ULL, 43691ULL, 87381ULL,
+		174763ULL, 349525ULL, 699051ULL, 1398101ULL, 2796203ULL, 5592405ULL, 11184811ULL,
+		22369621ULL, 44739243ULL, 89478485ULL
+	};
+
+	int size = std::floor(std::distance(first, last) / (order));
+	if (size < 2)
 		return;
 
 	// Quando há um elemento que não consegue formar um grupo de tamanho 'order'
 	// no final
-	bool has_stray = (size % 2 != 0);												// Se o tamanho for ímpar, há um elemento a mais
+	bool has_stray = (size % 2 != 0);
 	// bool has_odd = std::distance(first + order * size, last) != 0;
 
 	// Agrupar os elementos em grupos de tamanho 'order'
 
-	// typename Container::iterator end = has_stray ? last - order : last;				// Se tiver um elemento a mais, não o considera
-	typename Container::iterator end;
+	// typename Container::iterator end = has_stray ? last - order : last;
+	// typename Container::iterator end = first + ((order * size) - (has_stray * order));
+	typename Container::iterator end = PmergeMe<Container>::get_element_at(first, order * size - (has_stray ? order : 0));
 
-	// if (has_stray || has_odd)
-	// 	end = first + order * (size - (1 * !has_odd));
-	// else
-	// 	end = last;
+	for (typename Container::iterator it = first; it != end; std::advance(it, order * 2)) {
+		// if (PmergeMe::compare(it + (order - 1), it + ((order * 2) - 1))) {
+		// 	std::swap_ranges(it, it + order, it + order);
+		// }
 
-	end = first + ((order * size) - (has_stray * order));
-
-	for (typename Container::iterator it = first; it != end; it += (order * 2)) {	// Itera sobre o container, pulando de dois em dois grupos de tamanho 'order'
-		if (PmergeMe::compare(it + (order - 1), it + ((order * 2) - 1))) {				// Compara os dois últimos elementos do grupo atual
-			std::swap_ranges(it, it + order, it + order);									// Troca os dois grupos de tamanho 'order' se necessário
+		if (PmergeMe<Container>::compare(PmergeMe<Container>::get_element_at(it, order - 1), PmergeMe<Container>::get_element_at(it, (order * 2) - 1))) {
+			std::swap_ranges(it, PmergeMe<Container>::get_element_at(it, order), PmergeMe<Container>::get_element_at(it, order));
 		}
+
 	}
 
 	// Ordenar recursivamente os grupos de pares até que não seja mais possível
@@ -88,56 +104,140 @@ void PmergeMe<Container>::sort(typename Container::iterator first, typename Cont
 
 	PmergeMe<Container>::sort(first, end, order * 2);
 
-	// Separa main chain e elementos pend (pendentes)
+	Container main_chain;
+	std::vector<std::pair<Container, size_t> > pend_chain;
 
-	Container	main_chain;
-	Container	pend_chain;
-	main_chain.insert(main_chain.end(), first, first + order);
-	main_chain.insert(main_chain.end(), first + order, first + (order * 2));
+	main_chain.insert(main_chain.end(), first, PmergeMe::get_element_at(first, order));
+	main_chain.insert(main_chain.end(), PmergeMe::get_element_at(first, order), PmergeMe::get_element_at(first, order * 2));
 
-	for (typename Container::iterator it = first + (order * 2); it != end; it += (order * 2)) {
-		main_chain.insert(main_chain.end(), it + order, it + (order * 2));
-		pend_chain.insert(pend_chain.end(), it, it + order);
+	for (typename Container::iterator it = PmergeMe::get_element_at(first, order * 2); it != end; std::advance(it, order * 2)) {
+		main_chain.insert(main_chain.end(), PmergeMe::get_element_at(it, order), PmergeMe::get_element_at(it, order * 2));
+
+		std::pair<Container, size_t> pend_pair = std::make_pair(Container(it, PmergeMe::get_element_at(it, order)), (main_chain.size() / order) - 1);
+		pend_chain.push_back(pend_pair);
 	}
 
-	// Coloca os elementos que não formaram pares na pend chain
-	if (has_stray && std::distance(end, last) >= order)
-		pend_chain.insert(pend_chain.end(), end, end + order);
-
-	// Inserção binária na main chain
-
-	int	k = 0;
-	while (true) {
-		std::size_t dist = jacobsthal_diff[k];
-
-		if (dist >= pend_chain.size() / order)
-			break;
-
-		typename Container::iterator it = (pend_chain.begin() + (dist * order)) - 1;
-
-		while (dist > 0) {
-			typename Container::iterator insertion_point = PmergeMe::findInsertionPoint(main_chain, *it, (main_chain.size() / order) - 1, order);
-
-			main_chain.insert(insertion_point, it - order + 1, it + 1);
-			pend_chain.erase(it - order + 1, it + 1);
-
-			it -= order;
-			dist--;
-		}
-
-		k++;
+	if (has_stray && std::distance(end, last) >= order) {
+		std::pair<Container, size_t> pend_pair = std::make_pair(Container(end, PmergeMe::get_element_at(end, order)), (main_chain.size() / order) - 1);
+		pend_chain.push_back(pend_pair);
 	}
+
+// 	for (int k = 0; ; k++) {
+// 		unsigned long long dist = jacobsthal_diff[k];
+//
+// 		if (dist >= pend_chain.size())
+// 			break;
+//
+// 		std::vector<std::pair<Container, size_t> >::interator
+// 	}
 
 	while (!pend_chain.empty()) {
-		typename Container::iterator it = pend_chain.end() - 1;
-		typename Container::iterator insertion_point = PmergeMe::findInsertionPoint(main_chain, *it, (main_chain.size() / order) - 1, order);
-		main_chain.insert(insertion_point, it + 1 - order, it + 1);
-		pend_chain.erase(it + 1 - order, it + 1);
+		typename std::vector<std::pair<Container, size_t> >::iterator	last_item_in_pend = std::prev(pend_chain.end());
+		typename Container::iterator	insertion_point = PmergeMe::find_position(last_item_in_pend->first.begin(), main_chain.begin(), PmergeMe::get_element_at(main_chain.begin(), last_item_in_pend->second * order), order);
+
+		for (typename Container::iterator print = main_chain.begin(); print != main_chain.end(); std::advance(print, order)) {
+			std::cout << "( ";
+			// for (int i = 0; i < order; i++) {
+			// 	std::cout << *(print + i) << " ";
+			// }
+			std::cout << *(print + order) << " ";
+			std::cout << ") ";
+		}
+
+		// typename Container::iterator	insertion_point = PmergeMe::find_position(last_item_in_pend->first.begin(), main_chain.begin(), PmergeMe::get_element_at(main_chain.end(), -1), order);
+
+		main_chain.insert(insertion_point, last_item_in_pend->first.begin(), last_item_in_pend->first.end());
+
+		std::cout << "Apos inserido ";
+		for (typename Container::iterator print = main_chain.begin(); print != main_chain.end(); std::advance(print, order)) {
+			std::cout << "( ";
+			// for (int i = 0; i < order; i++) {
+			// 	std::cout << *(print + i) << " ";
+			// }
+			std::cout << *(print + order) << " ";
+			std::cout << ") ";
+		}
+		std::cout << std::endl;
+
+		pend_chain.pop_back();
 	}
 
-	// sobreescrever os elementos de first a last usando a main_chain.
-	std::size_t main_chain_size = main_chain.size();
-	std::copy(main_chain.begin(), main_chain.begin() + main_chain_size, first);
+	std::copy(main_chain.begin(), PmergeMe::get_element_at(main_chain.begin(), main_chain.size()), first);
+}
+
+template <typename Container>
+typename Container::iterator	PmergeMe<Container>::find_position(typename Container::iterator reference_value, typename Container::iterator first, typename Container::iterator last, int order) {
+// 	typename Container::iterator	mid;
+// 	typename Container::value_type	mid_value;
+// 	unsigned int distance;
+//
+// 	reference_value = PmergeMe::get_element_at(reference_value, order - 1);
+//
+// 	size_t dis;
+// 	while ((dis = std::distance(last, first)) != 0 && *first < *last) {
+// 		distance = std::distance(first, last) / (2 * order);
+// 		mid = PmergeMe::get_element_at(first, distance * order);
+// 		mid_value = *(PmergeMe::get_element_at(mid, order - 1));
+//
+// 		if (*mid == *reference_value)
+// 			return (mid);
+// 		else if (mid_value > *reference_value)
+// 			last = PmergeMe::get_element_at(mid, -order);
+// 		else
+// 			first = PmergeMe::get_element_at(mid, order);
+// 	}
+//
+// 	if (dis == 0) {
+// 		distance = std::distance(first, last) / (2 * order);
+// 		mid = PmergeMe::get_element_at(first, distance * order);
+// 		mid_value = *(PmergeMe::get_element_at(mid, order - 1));
+//
+// 		if (*mid == *reference_value)
+// 			return (mid);
+// 		else if (mid_value > *reference_value)
+// 			last = PmergeMe::get_element_at(mid, -order);
+// 		else
+// 			first = PmergeMe::get_element_at(mid, order);
+// 	}
+// 	return (first);
+
+	int	idx_first = 0;
+	int	idx_last = std::distance(first, last) / order;
+	int	idx_mid;
+
+	typename Container::value_type mid_value;
+	reference_value = PmergeMe::get_element_at(reference_value, order - 1);
+
+	while (idx_first <= idx_last) {
+		idx_mid = (idx_first + idx_last) / 2;
+		mid_value = *(PmergeMe::get_element_at(first, idx_mid * order + order - 1));
+
+		if (mid_value == *reference_value)
+			return (PmergeMe::get_element_at(first, idx_mid * order + order - 1));
+		else if (mid_value > *reference_value)
+			idx_last = idx_mid - 1;
+		else
+			idx_first = idx_mid + 1;
+	}
+
+	// std::copy(first, last, std::ostream_iterator<int>(std::cout, " "));
+
+	// for (typename Container::iterator print = first; std::distance(print, last) >= order; std::advance(print, order)) {
+	// 	std::cout << "( ";
+	// 	for (int i = 0; i < order; i++) {
+	// 		std::cout << *get_element_at(print, i) << " ";
+	// 	}
+	// 	std::cout << ") ";
+	// }
+
+	std::cout << "\n";
+	std::cout << "Procurado: " << std::setw(6) << *reference_value << " ";
+	std::cout << "First:     " << std::setw(6) << *first << " ";
+	std::cout << "Last:      " << std::setw(6) << *last << " ";
+	std::cout << "Econtrado: " << std::setw(6) << *PmergeMe::get_element_at(first, idx_first * order) << " ";
+	std::cout << std::endl;
+
+	return (PmergeMe::get_element_at(first, idx_first * order));
 }
 
 template <typename Container>
@@ -147,25 +247,5 @@ bool PmergeMe<Container>::compare(typename Container::iterator a, typename Conta
 	return false;
 }
 
-template <typename Container>
-typename Container::iterator PmergeMe<Container>::findInsertionPoint(Container& main_chain, typename Container::value_type reference_value, size_t limit, int order) {
-
-	int	left = 0;
-	int	right = limit;
-
-	while (left <= right) {
-		int	mid = left + (right - left) / 2;
-		typename Container::value_type	group_max = main_chain[(mid + 1) * order - 1];
-
-		if (group_max == reference_value)
-			return main_chain.begin() + (mid * order);
-		else if (group_max < reference_value)
-			left = mid + 1;
-		else
-			right = mid - 1;
-	}
-
-	return main_chain.begin() + (left * order);
-}
 
 #endif
