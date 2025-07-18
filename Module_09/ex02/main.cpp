@@ -5,7 +5,7 @@
 #include <deque>
 #include <sstream>
 #include "PmergeMe.hpp"
-//
+
 // int main() {
 // 	// Example usage of PmergeMe
 // 	std::deque<int> vec;
@@ -61,8 +61,8 @@
 // // 		return (0);
 // // 	}
 //
-// 	for (int i = 1; i < 11000; i++) {
-// 		for (int a = 0; a < 1; a++) {
+// 	for (int i = 1; i < 3000; i++) {
+// 		for (int a = 0; a < 10; a++) {
 // 			static int seed = 0;
 // 			srand(time(NULL) + seed++);
 // 			for (int j = 0; j < i; j++) {
